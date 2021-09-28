@@ -10,7 +10,6 @@ This product may include a number of subcomponents with separate copyright notic
 package internal
 
 import (
-	"crypto/tls"
 	"crypto/x509"
 	"errors"
 	"fmt"
@@ -71,22 +70,22 @@ func generateRabbitholeClient(rmq *rabbitmqv1beta1.RabbitmqCluster, svc *corev1.
 		return nil, errors.New("failed to retrieve username: key password missing from secret")
 	}
 
-	if rmq.TLSEnabled() {
-		// create TLS config for https request
-		cfg := new(tls.Config)
-		cfg.RootCAs = certPool
-
-		transport := &http.Transport{TLSClientConfig: cfg}
-		rabbitmqClient, err = rabbithole.NewTLSClient(endpoint, string(defaultUser), string(defaultUserPass), transport)
-		if err != nil {
-			return nil, fmt.Errorf("failed to instantiate rabbit rabbitmqClient: %v", err)
-		}
-	} else {
-		rabbitmqClient, err = rabbithole.NewClient(endpoint, string(defaultUser), string(defaultUserPass))
-		if err != nil {
-			return nil, fmt.Errorf("failed to instantiate rabbit rabbitmqClient: %v", err)
-		}
+	//if rmq.TLSEnabled() {
+	//	// create TLS config for https request
+	//	cfg := new(tls.Config)
+	//	cfg.RootCAs = certPool
+	//
+	//	transport := &http.Transport{TLSClientConfig: cfg}
+	//	rabbitmqClient, err = rabbithole.NewTLSClient(endpoint, string(defaultUser), string(defaultUserPass), transport)
+	//	if err != nil {
+	//		return nil, fmt.Errorf("failed to instantiate rabbit rabbitmqClient: %v", err)
+	//	}
+	//} else {
+	rabbitmqClient, err = rabbithole.NewClient(endpoint, string(defaultUser), string(defaultUserPass))
+	if err != nil {
+		return nil, fmt.Errorf("failed to instantiate rabbit rabbitmqClient: %v", err)
 	}
+	//}
 	return rabbitmqClient, nil
 }
 
@@ -101,11 +100,11 @@ func managementEndpoint(cluster *rabbitmqv1beta1.RabbitmqCluster, svc *corev1.Se
 
 // returns RabbitMQ management scheme from given cluster
 func managementScheme(cluster *rabbitmqv1beta1.RabbitmqCluster) string {
-	if cluster.TLSEnabled() {
-		return "https"
-	} else {
-		return "http"
-	}
+	//if cluster.TLSEnabled() {
+	//	return "https"
+	//} else {
+	return "http"
+	//}
 }
 
 // returns RabbitMQ management port from given service
@@ -113,9 +112,9 @@ func managementScheme(cluster *rabbitmqv1beta1.RabbitmqCluster) string {
 func managementPort(svc *corev1.Service) int {
 	var httpPort int
 	for _, port := range svc.Spec.Ports {
-		if port.Name == "management-tls" {
-			return int(port.Port)
-		}
+		//if port.Name == "management-tls" {
+		//	return int(port.Port)
+		//}
 		if port.Name == "management" {
 			httpPort = int(port.Port)
 		}
